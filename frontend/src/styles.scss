@@ -1,0 +1,298 @@
+// ── CSS Custom Properties ─────────────────────────────────────────────────
+
+:root {
+  --bg-primary: #0A0F1E;
+  --bg-secondary: #111827;
+  --bg-hover: #1E293B;
+  --bg-input: #0F172A;
+  --accent: #00C9A7;
+  --accent-dim: rgba(0, 201, 167, 0.15);
+  --border: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted: #64748B;
+}
+
+// Light mode
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #FFFFFF;
+    --bg-hover: #F1F5F9;
+    --bg-input: #F8FAFC;
+    --border: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-secondary: #334155;
+    --text-muted: #94A3B8;
+  }
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Syne', system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 16px; }
+
+p { margin: 0 0 8px; }
+
+// ── Page layout ───────────────────────────────────────────────────────────
+
+.page {
+  max-width: 1100px;
+  width: 100%;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.subtitle {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-family: 'DM Mono', monospace;
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────
+
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .material-icons { font-size: 16px; }
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+}
+
+.btn-sm {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+}
+
+// ── Form fields ───────────────────────────────────────────────────────────
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  input,
+  select,
+  textarea {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    width: 100%;
+
+    &::placeholder { color: var(--text-muted); }
+
+    &:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 201, 167, 0.08);
+    }
+  }
+
+  select {
+    cursor: pointer;
+    appearance: auto;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  thead {
+    background: var(--bg-hover);
+
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+
+      &:last-child { border-bottom: none; }
+      &:hover { background: rgba(255, 255, 255, 0.015); }
+    }
+
+    td {
+      padding: 11px 14px;
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+  }
+}
+
+// ── Utility classes ───────────────────────────────────────────────────────
+
+.muted { color: var(--text-muted) !important; }
+.mono { font-family: 'DM Mono', monospace !important; }
+.due { flex-shrink: 0; }
+
+.link { color: var(--accent); text-decoration: none; &:hover { text-decoration: underline; } }
+.link-btn {
+  color: var(--accent);
+  font-size: 12px;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+.loading {
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 32px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+  gap: 8px;
+  text-align: center;
+
+  .material-icons { font-size: 40px; opacity: 0.4; }
+  p { font-size: 14px; margin: 0; }
+}
+
+// ── Header actions ────────────────────────────────────────────────────────
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}

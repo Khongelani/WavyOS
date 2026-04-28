@@ -1,0 +1,110 @@
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+
+  button {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg-primary);
+      font-weight: 600;
+    }
+  }
+}
+
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+
+.task-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: opacity 0.15s;
+
+  &.done { opacity: 0.55; }
+}
+
+.check-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-top: 1px;
+
+  &.checked { color: var(--accent); }
+
+  .material-icons { font-size: 20px; }
+}
+
+.task-body { flex: 1; min-width: 0; }
+
+.task-desc {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 4px;
+
+  &.strikethrough { text-decoration: line-through; color: var(--text-muted); }
+}
+
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.task-company {
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+.task-due {
+  font-size: 11px;
+  color: var(--text-muted);
+
+  &.overdue { color: #f87171; }
+}
+
+.demo-tag {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  background: rgba(245,158,11,0.12);
+  color: #f59e0b;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.dismiss-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 2px;
+  flex-shrink: 0;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 1; color: #ef4444; }
+
+  .material-icons { font-size: 16px; }
+}
+
+.form-card { margin-bottom: 20px; }
