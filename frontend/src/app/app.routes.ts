@@ -52,6 +52,14 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent),
       },
+      {
+        path: 'sprint',
+        loadComponent: () => import('./pages/sprint/sprint.component').then(m => m.SprintComponent),
+      },
+      {
+        path: 'review',
+        loadComponent: () => import('./pages/review/review.component').then(m => m.ReviewComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

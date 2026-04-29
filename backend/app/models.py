@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import (
-    Column, Integer, String, Text, Float, Boolean, DateTime,
-    ForeignKey, Enum as SAEnum
+    Column, Integer, String, Text, Float, Boolean, DateTime, Date,
+    ForeignKey, Enum as SAEnum, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 import enum
@@ -122,6 +122,7 @@ class SignalBrief(Base):
     conversation_opener = Column(Text)
     is_edited = Column(Boolean, default=False)
     is_demo = Column(Boolean, default=False)
+    is_sent = Column(Boolean, default=False)  # Added: track if brief was sent to prospect
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     company = relationship("Company", back_populates="signal_briefs")
@@ -144,6 +145,10 @@ class OutreachDraft(Base):
     technical_validator_version = Column(Text)
     status = Column(SAEnum(OutreachDraftStatus), default=OutreachDraftStatus.draft)
     is_demo = Column(Boolean, default=False)
+    # Execution enforcement additions
+    marked_sent_at = Column(DateTime, nullable=True)
+    followup_due_at = Column(DateTime, nullable=True)
+    contact_status_after = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     contact = relationship("Contact", back_populates="outreach_drafts")
@@ -166,3 +171,37 @@ class Task(Base):
 
     company = relationship("Company", back_populates="tasks")
     contact = relationship("Contact", back_populates="tasks")
+
+
+# ── Execution Enforcement ────────────────────────────────────────────────────
+
+class WeeklySnapshot(Base):
+    __tablename__ = "weekly_snapshots"
+
+    id = Column(Integer, primary_key=True)
+    week_start_date = Column(Date, nullable=False, unique=True)
+    messages_sent = Column(Integer, default=0, nullable=False)
+    followups_sent = Column(Integer, default=0, nullable=False)
+    briefs_sent = Column(Integer, default=0, nullable=False)
+    calls_requested = Column(Integer, default=0, nullable=False)
+    replies_received = Column(Integer, default=0, nullable=False)
+    companies_researched = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+
+class WeeklyReview(Base):
+    __tablename__ = "weekly_reviews"
+
+    id = Column(Integer, primary_key=True)
+    week_start_date = Column(Date, nullable=False, unique=True)
+    what_was_sent = Column(Text)
+    who_replied = Column(Text)
+    what_worked = Column(Text)
+    industry_response = Column(Text)
+    change_next_week = Column(Text)
+    generated_targets = Column(Text)   # JSON string
+    generated_angle = Column(Text)
+    top_followups = Column(Text)       # JSON string
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

@@ -2,18 +2,47 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService, DashboardStats } from '../../core/services/api.service';
+import { ExecutionScoreboardComponent } from '../../shared/components/execution-scoreboard/execution-scoreboard.component';
+import { AntiLoopAlertsComponent } from '../../shared/components/anti-loop-alerts/anti-loop-alerts.component';
+import { FounderCommitmentComponent } from '../../shared/components/founder-commitment/founder-commitment.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [
+    CommonModule,
+    RouterLink,
+    ExecutionScoreboardComponent,
+    AntiLoopAlertsComponent,
+    FounderCommitmentComponent,
+  ],
   template: `
     <div class="page">
       <div class="page-header">
-        <h2>Dashboard</h2>
-        <span class="subtitle">Command overview</span>
+        <div>
+          <h2>Dashboard</h2>
+          <span class="subtitle">Command overview</span>
+        </div>
+        <div class="header-actions">
+          @if (isFriday) {
+            <a routerLink="/review" class="btn-primary btn-sm">
+              <span class="material-icons" style="font-size:14px">event_note</span>
+              Weekly Review
+            </a>
+          }
+        </div>
       </div>
 
+      <!-- ① Execution Scoreboard — always first, never hidden -->
+      <app-execution-scoreboard />
+
+      <!-- ② Founder Commitment Banner (Monday only, dismissible) -->
+      <app-founder-commitment />
+
+      <!-- ③ Anti-Loop Alerts -->
+      <app-anti-loop-alerts />
+
+      <!-- ④ Existing dashboard content below -->
       @if (loading) {
         <div class="loading">Loading stats...</div>
       } @else if (stats) {
@@ -83,13 +112,13 @@ import { ApiService, DashboardStats } from '../../core/services/api.service';
               <span class="material-icons">search</span>
               <span>Run Research</span>
             </a>
-            <a routerLink="/pipeline" class="action-card">
-              <span class="material-icons">view_kanban</span>
-              <span>View Pipeline</span>
+            <a routerLink="/sprint" class="action-card">
+              <span class="material-icons">rocket_launch</span>
+              <span>Sprint Board</span>
             </a>
-            <a routerLink="/contacts" class="action-card">
-              <span class="material-icons">person_add</span>
-              <span>Add Contact</span>
+            <a routerLink="/outreach" class="action-card">
+              <span class="material-icons">send</span>
+              <span>Draft Outreach</span>
             </a>
           </div>
         </div>
@@ -101,6 +130,7 @@ import { ApiService, DashboardStats } from '../../core/services/api.service';
 export class DashboardComponent implements OnInit {
   stats: DashboardStats | null = null;
   loading = true;
+  isFriday = new Date().getDay() === 5;
 
   constructor(private api: ApiService) {}
 

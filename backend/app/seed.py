@@ -1,10 +1,10 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal
-from app.models import PipelineStage, Company, Contact, ResearchReport, SignalBrief, Task
+from app.models import PipelineStage, Company, Contact, ResearchReport, SignalBrief, Task, OutreachDraft, WeeklySnapshot
 
 PIPELINE_STAGES = [
     {"name": "Target Identified", "order_index": 1, "color": "#64748B"},
@@ -179,5 +179,41 @@ async def run_seed():
                 is_demo=True,
             )
             db.add(task)
+            await db.flush()
+
+            # For the first company (Kumba), create a demo outreach draft that was sent 3 days ago
+            # This triggers AL03 (follow-up overdue) on the demo scoreboard
+            if i == 0:
+                draft = OutreachDraft(
+                    contact_id=contact.id,
+                    company_id=company.id,
+                    brief_id=brief.id,
+                    linkedin_message=f"Hi {contact.name} — noticed {company.name} is navigating expansion while sector payment cycles lengthen. Worth a quick chat on receivables timing?",
+                    email_subject=f"Working capital timing during {company.name}'s expansion phase",
+                    email_body=f"Hi {contact.name},\n\nI've been following {company.name}'s growth and noticed the expansion activity coinciding with broader sector pressure on receivables cycles.\n\nWould you be open to a 10-minute call?\n\nBest,\n[Your Name]",
+                    followup_message=f"Hi {contact.name} — following up on my note from last week. Let me know if useful.",
+                    gatekeeper_version=f"Hi — I'm hoping to connect with {contact.name} regarding a working capital insight for {company.name}.",
+                    technical_validator_version=f"Hi {contact.name} — reaching out about receivables cycle data.",
+                    status="sent",
+                    marked_sent_at=datetime.utcnow() - timedelta(days=3),
+                    followup_due_at=datetime.utcnow() - timedelta(days=1),
+                    contact_status_after="Not contacted",
+                    is_demo=True,
+                )
+                db.add(draft)
+
+        # Seed current WeeklySnapshot with amber-state values (below threshold but > 0)
+        today = date.today()
+        week_start = today - timedelta(days=today.weekday())
+        snapshot = WeeklySnapshot(
+            week_start_date=week_start,
+            messages_sent=4,        # amber: threshold is 5
+            followups_sent=2,       # amber: threshold is 3
+            briefs_sent=1,          # green: threshold is 1
+            calls_requested=0,      # red: threshold is 1
+            replies_received=1,
+            companies_researched=3,
+        )
+        db.add(snapshot)
 
         await db.commit()

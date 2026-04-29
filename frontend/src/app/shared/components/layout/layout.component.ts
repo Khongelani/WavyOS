@@ -87,14 +87,16 @@ export class LayoutComponent {
     { path: '/research', label: 'Research', icon: 'search' },
     { path: '/signal-briefs', label: 'Signal Briefs', icon: 'analytics' },
     { path: '/outreach', label: 'Outreach', icon: 'send' },
+    { path: '/sprint', label: 'Sprint Board', icon: 'rocket_launch' },
+    { path: '/review', label: 'Weekly Review', icon: 'event_note' },
     { path: '/tasks', label: 'Tasks', icon: 'check_circle' },
     { path: '/settings', label: 'Settings', icon: 'settings' },
   ];
 
   mobileNavItems: NavItem[] = [
     { path: '/dashboard', label: 'Home', icon: 'dashboard' },
-    { path: '/companies', label: 'Companies', icon: 'business' },
     { path: '/pipeline', label: 'Pipeline', icon: 'view_kanban' },
+    { path: '/sprint', label: 'Sprint', icon: 'rocket_launch' },
     { path: '/tasks', label: 'Tasks', icon: 'check_circle' },
     { path: '/settings', label: 'More', icon: 'settings' },
   ];

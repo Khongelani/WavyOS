@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, Company, Contact, SignalBrief, OutreachDraft } from '../../core/services/api.service';
+import { SendReadyPanelComponent } from '../../shared/components/send-ready-panel/send-ready-panel.component';
 
 @Component({
   selector: 'app-outreach',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SendReadyPanelComponent],
   template: `
     <div class="page">
       <div class="page-header">
@@ -18,7 +19,7 @@ import { ApiService, Company, Contact, SignalBrief, OutreachDraft } from '../../
 
       <div class="warning-banner">
         <span class="material-icons">warning</span>
-        <strong>Review before sending.</strong> No messages are sent automatically. All output is draft text only — copy manually.
+        <strong>Review before sending.</strong> No messages are sent automatically. All output is draft text only.
       </div>
 
       <div class="card generator">
@@ -69,64 +70,12 @@ import { ApiService, Company, Contact, SignalBrief, OutreachDraft } from '../../
       </div>
 
       @if (draft) {
-        <div class="drafts">
+        <div class="draft-output">
           @if (draft.is_demo) {
             <div class="demo-badge">DEMO OUTPUT</div>
           }
-
-          <div class="draft-card">
-            <div class="draft-label">LinkedIn Message
-              <span class="char-count mono">{{ (draft.linkedin_message || '').length }}/200</span>
-            </div>
-            <div class="draft-content">{{ draft.linkedin_message }}</div>
-            <button class="copy-btn" (click)="copy(draft.linkedin_message)">
-              <span class="material-icons">content_copy</span> Copy
-            </button>
-          </div>
-
-          <div class="draft-card">
-            <div class="draft-label">Email Subject</div>
-            <div class="draft-content subject">{{ draft.email_subject }}</div>
-            <button class="copy-btn" (click)="copy(draft.email_subject)">
-              <span class="material-icons">content_copy</span> Copy
-            </button>
-          </div>
-
-          <div class="draft-card">
-            <div class="draft-label">Email Body</div>
-            <pre class="draft-content">{{ draft.email_body }}</pre>
-            <button class="copy-btn" (click)="copy(draft.email_body)">
-              <span class="material-icons">content_copy</span> Copy
-            </button>
-          </div>
-
-          <div class="draft-card">
-            <div class="draft-label">Follow-up Message</div>
-            <div class="draft-content">{{ draft.followup_message }}</div>
-            <button class="copy-btn" (click)="copy(draft.followup_message)">
-              <span class="material-icons">content_copy</span> Copy
-            </button>
-          </div>
-
-          <div class="draft-card">
-            <div class="draft-label">Gatekeeper Version</div>
-            <div class="draft-content">{{ draft.gatekeeper_version }}</div>
-            <button class="copy-btn" (click)="copy(draft.gatekeeper_version)">
-              <span class="material-icons">content_copy</span> Copy
-            </button>
-          </div>
-
-          <div class="draft-card">
-            <div class="draft-label">Technical Validator Version</div>
-            <div class="draft-content">{{ draft.technical_validator_version }}</div>
-            <button class="copy-btn" (click)="copy(draft.technical_validator_version)">
-              <span class="material-icons">content_copy</span> Copy
-            </button>
-          </div>
-
-          @if (copied) {
-            <div class="copy-toast">Copied to clipboard!</div>
-          }
+          <!-- SendReadyPanel handles all copy + mark-as-sent flow -->
+          <app-send-ready-panel [draft]="draft" (sent)="onDraftSent()" />
         </div>
       }
     </div>
@@ -143,7 +92,6 @@ export class OutreachComponent implements OnInit {
   tone = 'professional';
   generating = false;
   draft: OutreachDraft | null = null;
-  copied = false;
 
   constructor(private api: ApiService) {}
 
@@ -176,11 +124,9 @@ export class OutreachComponent implements OnInit {
     });
   }
 
-  copy(text?: string): void {
-    if (!text) return;
-    navigator.clipboard.writeText(text).then(() => {
-      this.copied = true;
-      setTimeout(() => (this.copied = false), 2000);
-    });
+  onDraftSent(): void {
+    // Draft was marked sent — refresh so the panel reflects the new state
+    if (!this.draft) return;
+    this.api.getCompanies().subscribe(); // trigger any refresh needed
   }
 }

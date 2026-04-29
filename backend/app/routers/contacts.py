@@ -1,12 +1,14 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 from typing import List, Optional
 
 from app.database import get_db
-from app.models import Contact
+from app.models import Contact, WeeklySnapshot
 from app.schemas import ContactCreate, ContactUpdate, ContactOut
 from app.auth import get_current_user
+from app.routers.execution import get_or_create_snapshot, current_week_start
 
 router = APIRouter(prefix="/contacts", tags=["contacts"])
 
@@ -60,10 +62,33 @@ async def update_contact(
     contact = await db.get(Contact, contact_id)
     if not contact:
         raise HTTPException(status_code=404, detail="Contact not found")
+
+    prev_status = contact.outreach_status
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(contact, field, value)
     await db.commit()
     await db.refresh(contact)
+
+    # Auto-increment execution snapshot based on status transitions
+    new_status = contact.outreach_status
+    if prev_status != new_status:
+        week_start = current_week_start()
+        await get_or_create_snapshot(db)
+        if new_status == "Replied":
+            await db.execute(
+                update(WeeklySnapshot)
+                .where(WeeklySnapshot.week_start_date == week_start)
+                .values(replies_received=WeeklySnapshot.replies_received + 1, updated_at=datetime.utcnow())
+            )
+            await db.commit()
+        elif new_status == "Meeting booked":
+            await db.execute(
+                update(WeeklySnapshot)
+                .where(WeeklySnapshot.week_start_date == week_start)
+                .values(calls_requested=WeeklySnapshot.calls_requested + 1, updated_at=datetime.utcnow())
+            )
+            await db.commit()
+
     return contact
 
 

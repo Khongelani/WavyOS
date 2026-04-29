@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import engine, Base
-from app.routers import auth, companies, contacts, outreach, pipeline, tasks, dashboard, admin
+from app.routers import auth, companies, contacts, outreach, pipeline, tasks, dashboard, admin, execution, sprint
 
 structlog.configure(
     processors=[
@@ -58,6 +58,8 @@ app.include_router(pipeline.router)
 app.include_router(tasks.router)
 app.include_router(dashboard.router)
 app.include_router(admin.router)
+app.include_router(execution.router)
+app.include_router(sprint.router)
 
 
 @app.get("/")

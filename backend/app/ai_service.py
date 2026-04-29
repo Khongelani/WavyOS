@@ -217,3 +217,68 @@ Return a JSON object with exactly these keys:
 
 async def score_lead(company_name: str, contact_role: str) -> float:
     return 0.65
+
+
+# ── Weekly Review ─────────────────────────────────────────────────────────────
+
+DEMO_REVIEW = {
+    "next_week_targets": [
+        "Mining sector CFOs who have published quarterly results in the last 30 days",
+        "Logistics companies with announced cross-border expansion",
+        "Insurance sector finance directors at mid-cap firms",
+    ],
+    "improved_angle": "Lead with a specific receivables benchmark from their sector rather than opening with a product question. Reference a public signal first.",
+    "top_followups": [
+        {"contact": "Thabo Nkosi", "company": "Kumba Iron Ore", "reason": "No reply in 72 hours — high-value CFO, follow up via LinkedIn"},
+        {"contact": "Lerato Dlamini", "company": "Santam", "reason": "Replied but meeting not booked — re-engage with signal brief"},
+        {"contact": "Sipho Mokoena", "company": "Grindrod", "reason": "Technical validator — loop in before CFO meeting"},
+    ],
+    "is_demo": True,
+}
+
+
+async def generate_weekly_review(
+    snapshot: dict,
+    what_worked: str,
+    industry_response: str,
+    active_companies: list,
+) -> dict:
+    if not settings.OPENAI_API_KEY:
+        return {**DEMO_REVIEW, "is_demo": True}
+
+    try:
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+
+        prompt = json.dumps({
+            "messages_sent": snapshot.get("messages_sent", 0),
+            "replies_received": snapshot.get("replies_received", 0),
+            "companies_researched": snapshot.get("companies_researched", 0),
+            "what_worked": what_worked or "not provided",
+            "industry_response": industry_response or "not provided",
+            "active_companies": active_companies[:15],
+        })
+
+        system = """You are a B2B sales execution advisor reviewing a founder's outreach week. Your job is to identify the highest-leverage next actions — not to motivate, but to prioritise. Be specific. Be brief. Avoid generic advice. Return only valid JSON with keys: next_week_targets (array of strings), improved_angle (string), top_followups (array of objects with contact, company, reason keys)."""
+
+        t0 = time.time()
+        resp = await client.chat.completions.create(
+            model=settings.OPENAI_MODEL,
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=600,
+        )
+        duration = time.time() - t0
+        log.info("ai_review_complete", duration=round(duration, 2),
+                 tokens=resp.usage.total_tokens if resp.usage else None)
+
+        data = json.loads(resp.choices[0].message.content)
+        data["is_demo"] = False
+        return data
+
+    except Exception as e:
+        log.error("ai_review_failed", error=str(e))
+        return {**DEMO_REVIEW, "is_demo": True}

@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, update
 from typing import List, Optional
 import json
 from datetime import datetime
 
 from app.database import get_db
-from app.models import Company, ResearchReport, SignalBrief, Contact, Task
+from app.models import Company, ResearchReport, SignalBrief, Contact, Task, WeeklySnapshot
 from app.schemas import CompanyCreate, CompanyUpdate, CompanyOut, CompanyListOut, ResearchRequest, ResearchOut, BriefGenerateRequest, BriefOut, BriefUpdate
 from app.auth import get_current_user
 from app import ai_service
+from app.routers.execution import get_or_create_snapshot, current_week_start
 
 router = APIRouter(prefix="/companies", tags=["companies"])
 
@@ -153,6 +154,21 @@ async def run_research(
 
     await db.commit()
     await db.refresh(report)
+
+    # Increment companies_researched in snapshot (only for real AI research, not demo)
+    if not report.is_demo:
+        week_start = current_week_start()
+        await get_or_create_snapshot(db)
+        await db.execute(
+            update(WeeklySnapshot)
+            .where(WeeklySnapshot.week_start_date == week_start)
+            .values(
+                companies_researched=WeeklySnapshot.companies_researched + 1,
+                updated_at=datetime.utcnow(),
+            )
+        )
+        await db.commit()
+
     return ResearchOut.from_orm(report)
 
 

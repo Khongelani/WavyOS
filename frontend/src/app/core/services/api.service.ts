@@ -81,6 +81,9 @@ export interface OutreachDraft {
   gatekeeper_version?: string;
   technical_validator_version?: string;
   status?: string;
+  marked_sent_at?: string;
+  followup_due_at?: string;
+  contact_status_after?: string;
   is_demo: boolean;
   created_at: string;
 }
