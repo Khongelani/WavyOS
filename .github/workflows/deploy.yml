@@ -1,0 +1,175 @@
+name: Deploy to Firebase & Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+env:
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || 'wavyos-prod-2026' }}
+  GCP_REGION: ${{ vars.GCP_REGION || 'africa-south1' }}
+  BACKEND_IMAGE: ${{ vars.GCP_REGION || 'africa-south1' }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID || 'wavyos-prod-2026' }}/wavyos/backend
+  CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE || 'wavyos-backend' }}
+
+jobs:
+  # ─── Test Backend ─────────────────────────────────────────────────────────
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: wavyos_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/wavyos_test
+          JWT_SECRET: ci-test-secret-not-for-production
+          OWNER_EMAIL: test@test.com
+          OWNER_PASSWORD: testpassword
+        run: pytest --tb=short -q
+
+  # ─── Test Frontend ────────────────────────────────────────────────────────
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+
+  # ─── Deploy Backend to Cloud Run ─────────────────────────────────────────
+  deploy-backend:
+    name: Deploy Backend → Cloud Run
+    runs-on: ubuntu-latest
+    needs: [test-backend]
+    permissions:
+      contents: read
+      id-token: write   # required for Workload Identity Federation
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          # Option A — Workload Identity Federation (recommended, no long-lived keys):
+          #   workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          #   service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          #
+          # Option B — Service Account JSON key (simpler to set up):
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build & push backend image
+        working-directory: backend
+        run: |
+          IMAGE_TAG="${{ env.BACKEND_IMAGE }}:${{ github.sha }}"
+          IMAGE_LATEST="${{ env.BACKEND_IMAGE }}:latest"
+          docker build -t "$IMAGE_TAG" -t "$IMAGE_LATEST" .
+          docker push "$IMAGE_TAG"
+          docker push "$IMAGE_LATEST"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.CLOUD_RUN_SERVICE }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.IMAGE_TAG }}
+          env_vars: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            OWNER_EMAIL=${{ secrets.OWNER_EMAIL }}
+            OWNER_PASSWORD=${{ secrets.OWNER_PASSWORD }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            SERPER_API_KEY=${{ secrets.SERPER_API_KEY }}
+            ENABLE_WEB_INTELLIGENCE=true
+          flags: >-
+            --allow-unauthenticated
+            --port=8000
+            --memory=512Mi
+            --cpu=1
+            --min-instances=0
+            --max-instances=5
+            --timeout=120
+
+  # ─── Deploy Frontend to Firebase Hosting ─────────────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend → Firebase Hosting
+    runs-on: ubuntu-latest
+    needs: [test-frontend, deploy-backend]
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Angular (production)
+        working-directory: frontend
+        run: npm run build:prod
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live

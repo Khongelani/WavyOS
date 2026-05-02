@@ -1,0 +1,52 @@
+# ── Environment / secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+docker-compose.override.yml
+
+# ── Python / Backend ─────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+env/
+dist/
+build/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+test.db
+*.db
+*.sqlite3
+
+# ── Node / Frontend ──────────────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/.angular/
+.cache/
+*.tsbuildinfo
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+postgres_data/
+
+# ── Firebase ─────────────────────────────────────────────────────────────────
+.firebase/
+firebase-debug.log
+
+# ── GCP ──────────────────────────────────────────────────────────────────────
+service-account-key.json
+*-sa-key.json
+
+# ── OS / IDE ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo

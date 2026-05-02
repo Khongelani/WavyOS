@@ -1,0 +1,181 @@
+.summary-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.summary-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.summary-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+
+  &.amber { color: #f59e0b; }
+  &.green { color: #22c55e; }
+}
+
+.summary-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.summary-sep {
+  color: var(--border);
+  font-size: 18px;
+}
+
+.sprint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stage-group {}
+
+.stage-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.stage-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stage-group-name {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.stage-group-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  border-radius: 10px;
+  padding: 0 6px;
+}
+
+.sprint-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+
+  &.needs-action {
+    border-left: 3px solid #f59e0b;
+  }
+}
+
+.sprint-row-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.company-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.company-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  &:hover { color: var(--accent); }
+}
+
+.industry-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.sprint-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.days-badge {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  border-radius: 4px;
+  padding: 2px 6px;
+
+  &.amber { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+}
+
+.task-due { font-size: 11px; }
+
+.sprint-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stage-select-mini {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  outline: none;
+  max-width: 150px;
+  cursor: pointer;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+
+  .material-icons { font-size: 16px; }
+
+  &.forward-btn:hover { border-color: var(--accent); color: var(--accent); }
+  &.dismiss-btn:hover { border-color: #ef4444; color: #ef4444; }
+}

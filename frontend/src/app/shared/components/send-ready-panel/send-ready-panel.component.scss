@@ -1,0 +1,141 @@
+.send-ready-panel {
+  margin-top: 0;
+}
+
+.copy-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.draft-block {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.draft-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.draft-variant-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+}
+
+.char-count {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.email-subject {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.draft-body {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.email-pre {
+  font-family: inherit;
+  white-space: pre-wrap;
+  margin: 0 0 10px;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 70px;
+  justify-content: center;
+
+  &:hover { border-color: var(--accent); color: var(--accent); }
+}
+
+// ── Mark as sent section ───────────────────────────────────────────────────
+
+.mark-sent-section {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.send-status {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-mark-sent {
+  align-self: flex-start;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.no-auto-send-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.sent-confirmation {
+  font-size: 13px;
+  color: #22c55e;
+  font-family: 'DM Mono', monospace;
+  padding: 8px 0;
+}
+
+.sent-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
+.followup-info {
+  color: #f59e0b;
+}

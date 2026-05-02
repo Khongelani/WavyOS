@@ -1,0 +1,78 @@
+.generator {
+  margin-bottom: 24px;
+  h3 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  .field { flex: 1; min-width: 180px; }
+
+  button { flex-shrink: 0; align-self: flex-end; }
+}
+
+.brief-result { margin-top: 24px; }
+
+.brief-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.bf {
+  margin-bottom: 16px;
+
+  .bf-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 6px;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
+    li { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  }
+
+  blockquote {
+    margin: 0;
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent);
+    background: rgba(0, 201, 167, 0.05);
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+}
+
+.demo-badge {
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.35);
+  color: #f59e0b;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  display: inline-block;
+}
