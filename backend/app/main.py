@@ -50,17 +50,20 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-app.include_router(auth.router)
-app.include_router(companies.router)
-app.include_router(contacts.router)
-app.include_router(outreach.router)
-app.include_router(pipeline.router)
-app.include_router(tasks.router)
-app.include_router(dashboard.router)
-app.include_router(admin.router)
-app.include_router(execution.router)
-app.include_router(sprint.router)
-app.include_router(intelligence.router)
+from fastapi import APIRouter as _APIRouter
+_api = _APIRouter(prefix="/api")
+_api.include_router(auth.router)
+_api.include_router(companies.router)
+_api.include_router(contacts.router)
+_api.include_router(outreach.router)
+_api.include_router(pipeline.router)
+_api.include_router(tasks.router)
+_api.include_router(dashboard.router)
+_api.include_router(admin.router)
+_api.include_router(execution.router)
+_api.include_router(sprint.router)
+_api.include_router(intelligence.router)
+app.include_router(_api)
 
 
 @app.get("/")
